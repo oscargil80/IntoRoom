@@ -19,8 +19,8 @@ interface PersonDao {
     @Query("Delete from person_table where pId = :pId")
     suspend fun deletepersonById(pId:Int)
 
-    @Query("SELECT * FROM persona_table")
-     fun deleteAllData(): Flow<List<Person>>
+    @Query("SELECT * FROM person_table")
+     fun getAllData(): Flow<List<Person>>
 
 
 }
