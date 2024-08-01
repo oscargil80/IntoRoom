@@ -8,7 +8,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.oscargil80.intoroom.databinding.FragmentAddEditPersonalBinding
 
 
-class AddEditPersonFragment(private val listener: AddEditPersonListener) :
+class AddEditPersonFragment(
+    private val listener: AddEditPersonListener,
+    private val person: Person?
+) :
     BottomSheetDialogFragment() {
 
     private lateinit var binding: FragmentAddEditPersonalBinding
@@ -26,8 +29,18 @@ class AddEditPersonFragment(private val listener: AddEditPersonListener) :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        if (person != null) {
+            setExistingDataOnUI(person)
+        }
         attachUiListener()
 
+    }
+
+    private fun setExistingDataOnUI(person: Person) {
+        binding.personNameEt.setText(person.name)
+        binding.personAgeEt.setText(person.age.toString())
+        binding.personCityEt.setText(person.city)
+        binding.saveBtn.text = "Update"
     }
 
     private fun attachUiListener() {
@@ -37,12 +50,10 @@ class AddEditPersonFragment(private val listener: AddEditPersonListener) :
             val city = binding.personCityEt.text.toString()
 
             if (name.isNotEmpty() && age.isNotEmpty() && city.isNotEmpty()) {
-                val person = Person(0, name, age.toInt(), city)
-                listener.onSaveBtnClicked((person))
+                val person1 = Person(person?.pId ?: 0, name, age.toInt(), city)
+                listener.onSaveBtnClicked(person != null, person1)
             }
             dismiss()
-
-
         }
     }
 
@@ -51,7 +62,7 @@ class AddEditPersonFragment(private val listener: AddEditPersonListener) :
     }
 
     interface AddEditPersonListener {
-        fun onSaveBtnClicked(person: Person)
+        fun onSaveBtnClicked(isUpdate:Boolean,   person: Person)
 
     }
 }

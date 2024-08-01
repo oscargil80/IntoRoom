@@ -4,11 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
-import com.oscargil80.intoroom.R
-import com.oscargil80.intoroom.databinding.SingleItemBinding
 
-class PersonDetailsAdapter : ListAdapter<Person, PersonViewHolder>(PersonDiffUtill()) {
+class PersonDetailsAdapter(private val listener: PersonDetailsClickListener ) : ListAdapter<Person, PersonViewHolder>(PersonDiffUtill()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PersonViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -17,9 +14,13 @@ class PersonDetailsAdapter : ListAdapter<Person, PersonViewHolder>(PersonDiffUti
 
     override fun onBindViewHolder(holder: PersonViewHolder, position: Int) {
         val item = getItem(position)
-        holder.render(item)
+        holder.render(item, listener)
     }
 
+interface PersonDetailsClickListener{
+    fun onEditPersonClick(person: Person)
+    fun onDeletePersonClick(person: Person)
+}
 
 }
 

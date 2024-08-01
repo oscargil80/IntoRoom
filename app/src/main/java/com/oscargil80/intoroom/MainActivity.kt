@@ -2,6 +2,7 @@ package com.oscargil80.intoroom
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.oscargil80.intoroom.databinding.ActivityMainBinding
@@ -9,7 +10,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-class MainActivity : AppCompatActivity(), AddEditPersonFragment.AddEditPersonListener {
+class MainActivity : AppCompatActivity(), AddEditPersonFragment.AddEditPersonListener,
+    PersonDetailsAdapter.PersonDetailsClickListener {
     private lateinit var binding: ActivityMainBinding
     private var dao: PersonDao? = null
     private lateinit var adapter: PersonDetailsAdapter
@@ -32,8 +34,6 @@ class MainActivity : AppCompatActivity(), AddEditPersonFragment.AddEditPersonLis
                 adapter.submitList(mList)
             }
         }
-
-
     }
 
     private fun attachUiListener() {
@@ -42,8 +42,8 @@ class MainActivity : AppCompatActivity(), AddEditPersonFragment.AddEditPersonLis
         }
     }
 
-    private fun showBottonSheet() {
-        val bottonSheet = AddEditPersonFragment(this)
+    private fun showBottonSheet(person: Person? = null) {
+        val bottonSheet = AddEditPersonFragment(this, person)
         bottonSheet.show(supportFragmentManager, AddEditPersonFragment.TAG)
     }
 
@@ -51,15 +51,31 @@ class MainActivity : AppCompatActivity(), AddEditPersonFragment.AddEditPersonLis
         dao = AppDatabase.gatDatabase(this).personDao()
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
-        adapter = PersonDetailsAdapter()
+        adapter = PersonDetailsAdapter(this)
         binding.recyclerView.adapter = adapter
     }
 
-    override fun onSaveBtnClicked(person: Person) {
+    override fun onSaveBtnClicked(isUpdate: Boolean, person: Person) {
         lifecycleScope.launch(Dispatchers.IO) {
-            dao?.savePerson(person)
+
+            if (isUpdate)
+                dao?.savePerson(person)
+            else
+                dao?.savePerson(person)
+
         }
+    }
 
+    override fun onEditPersonClick(person: Person) {
+        showBottonSheet(person)
 
+    }
+
+    override fun onDeletePersonClick(person: Person) {
+        lifecycleScope.launch(Dispatchers.IO){
+            dao?.deletepersonById(person.pId)
+            //dao?.deletePerson(person)
+
+        }
     }
 }
