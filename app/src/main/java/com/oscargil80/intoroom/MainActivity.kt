@@ -2,12 +2,15 @@ package com.oscargil80.intoroom
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.SearchView.OnQueryTextListener
 import android.widget.Toast
+import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.oscargil80.intoroom.databinding.ActivityMainBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), AddEditPersonFragment.AddEditPersonListener,
@@ -32,6 +35,8 @@ class MainActivity : AppCompatActivity(), AddEditPersonFragment.AddEditPersonLis
 
             dao?.getAllData()?.collect { mList ->
                 adapter.submitList(mList)
+                binding.searchcView.setQuery("", false)
+                binding.searchcView.clearFocus()
             }
         }
     }
@@ -40,6 +45,26 @@ class MainActivity : AppCompatActivity(), AddEditPersonFragment.AddEditPersonLis
         binding.floatingActionButton.setOnClickListener {
             showBottonSheet()
         }
+
+
+         // En el video no funciona debido a que debo ponerle aqui SearchView.OnQueryTextListener y en el video es OnQueryTextListener
+        binding.searchcView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+
+            override fun onQueryTextSubmit(query: String?) = false
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                if (newText != null)
+                    onQueryChange(newText)
+                return true
+            }
+        })
+    }
+
+    private fun onQueryChange(query: String) {
+        lifecycleScope.launch {
+            adapter.submitList( dao?.getSearchedData(query)?.first() )
+        }
+
     }
 
     private fun showBottonSheet(person: Person? = null) {
@@ -72,7 +97,7 @@ class MainActivity : AppCompatActivity(), AddEditPersonFragment.AddEditPersonLis
     }
 
     override fun onDeletePersonClick(person: Person) {
-        lifecycleScope.launch(Dispatchers.IO){
+        lifecycleScope.launch(Dispatchers.IO) {
             dao?.deletepersonById(person.pId)
             //dao?.deletePerson(person)
 
