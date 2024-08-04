@@ -93,7 +93,6 @@ class MainActivity : AppCompatActivity(), AddEditPersonFragment.AddEditPersonLis
 
     override fun onEditPersonClick(person: Person) {
         showBottonSheet(person)
-
     }
 
     override fun onDeletePersonClick(person: Person) {
@@ -102,5 +101,5 @@ class MainActivity : AppCompatActivity(), AddEditPersonFragment.AddEditPersonLis
             //dao?.deletePerson(person)
 
         }
-    }
+   }
 }
