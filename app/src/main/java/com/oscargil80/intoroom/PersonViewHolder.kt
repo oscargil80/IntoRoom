@@ -13,17 +13,21 @@ class PersonViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         }
     }*/
 
-    fun render(Person: Person, personDetailsClickListener: PersonDetailsAdapter.PersonDetailsClickListener) {
+    fun render(
+        Person: Person,
+        editClickListener: (Person) -> Unit,
+        deleteClickListener: (Person) -> Unit
+    ) {
         binding.personNameTv.text = Person.name
         binding.personCityTv.text = Person.city
         binding.personAgeTv.text = Person.age.toString()
 
         binding.editBtn.setOnClickListener{
-            personDetailsClickListener.onEditPersonClick(Person)
+            editClickListener(Person)
         }
 
         binding.deleteBtn.setOnClickListener{
-            personDetailsClickListener.onDeletePersonClick(Person)
+            deleteClickListener(Person)
         }
 
 

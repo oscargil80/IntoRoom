@@ -13,8 +13,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-class MainActivity : AppCompatActivity(), AddEditPersonFragment.AddEditPersonListener,
-    PersonDetailsAdapter.PersonDetailsClickListener {
+class MainActivity : AppCompatActivity(), AddEditPersonFragment.AddEditPersonListener {
     private lateinit var binding: ActivityMainBinding
     private var dao: PersonDao? = null
     private lateinit var adapter: PersonDetailsAdapter
@@ -47,8 +46,8 @@ class MainActivity : AppCompatActivity(), AddEditPersonFragment.AddEditPersonLis
         }
 
 
-         // En el video no funciona debido a que debo ponerle aqui SearchView.OnQueryTextListener y en el video es OnQueryTextListener
-        binding.searchcView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+        // En el video no funciona debido a que debo ponerle aqui SearchView.OnQueryTextListener y en el video es OnQueryTextListener
+        binding.searchcView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
             override fun onQueryTextSubmit(query: String?) = false
 
@@ -62,7 +61,7 @@ class MainActivity : AppCompatActivity(), AddEditPersonFragment.AddEditPersonLis
 
     private fun onQueryChange(query: String) {
         lifecycleScope.launch {
-            adapter.submitList( dao?.getSearchedData(query)?.first() )
+            adapter.submitList(dao?.getSearchedData(query)?.first())
         }
 
     }
@@ -76,8 +75,21 @@ class MainActivity : AppCompatActivity(), AddEditPersonFragment.AddEditPersonLis
         dao = AppDatabase.gatDatabase(this).personDao()
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
-        adapter = PersonDetailsAdapter(this)
+        adapter = PersonDetailsAdapter(
+            editClickListener = {Person -> editClickListener(Person)},
+            deleteClickListener = {Person -> deleteClickListener(Person)}
+        )
         binding.recyclerView.adapter = adapter
+    }
+
+    private fun editClickListener(person: Person) {
+        showBottonSheet(person)
+    }
+
+    private fun deleteClickListener(person: Person) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            dao?.deletepersonById(person.pId)
+        }
     }
 
     override fun onSaveBtnClicked(isUpdate: Boolean, person: Person) {
@@ -91,7 +103,7 @@ class MainActivity : AppCompatActivity(), AddEditPersonFragment.AddEditPersonLis
         }
     }
 
-    override fun onEditPersonClick(person: Person) {
+/*    override fun onEditPersonClick(person: Person) {
         showBottonSheet(person)
     }
 
@@ -101,5 +113,5 @@ class MainActivity : AppCompatActivity(), AddEditPersonFragment.AddEditPersonLis
             //dao?.deletePerson(person)
 
         }
-   }
+    }*/
 }
