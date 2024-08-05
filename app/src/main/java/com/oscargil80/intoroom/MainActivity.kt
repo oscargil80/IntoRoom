@@ -23,15 +23,13 @@ class MainActivity : AppCompatActivity(), AddEditPersonFragment.AddEditPersonLis
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        initVars()
-        attachUiListener()
-        subscribeDataStreams()
+        initComponent() // Iniciar Componentes
+        InitBottonFloating()// Iniciar Boton Floating
+        cargarDatosSearchView() // Cragar adapter
     }
 
-    private fun subscribeDataStreams() {
+    private fun cargarDatosSearchView() {
         lifecycleScope.launch {
-
             dao?.getAllData()?.collect { mList ->
                 adapter.submitList(mList)
                 binding.searchcView.setQuery("", false)
@@ -40,20 +38,18 @@ class MainActivity : AppCompatActivity(), AddEditPersonFragment.AddEditPersonLis
         }
     }
 
-    private fun attachUiListener() {
+    private fun InitBottonFloating() {
         binding.floatingActionButton.setOnClickListener {
             showBottonSheet()
         }
 
-
         // En el video no funciona debido a que debo ponerle aqui SearchView.OnQueryTextListener y en el video es OnQueryTextListener
         binding.searchcView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-
             override fun onQueryTextSubmit(query: String?) = false
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 if (newText != null)
-                    onQueryChange(newText)
+                    onQueryChange(newText)// Cuando metemos un valor
                 return true
             }
         })
@@ -63,7 +59,6 @@ class MainActivity : AppCompatActivity(), AddEditPersonFragment.AddEditPersonLis
         lifecycleScope.launch {
             adapter.submitList(dao?.getSearchedData(query)?.first())
         }
-
     }
 
     private fun showBottonSheet(person: Person? = null) {
@@ -71,7 +66,7 @@ class MainActivity : AppCompatActivity(), AddEditPersonFragment.AddEditPersonLis
         bottonSheet.show(supportFragmentManager, AddEditPersonFragment.TAG)
     }
 
-    private fun initVars() {
+    private fun initComponent() {
         dao = AppDatabase.gatDatabase(this).personDao()
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
@@ -94,7 +89,6 @@ class MainActivity : AppCompatActivity(), AddEditPersonFragment.AddEditPersonLis
 
     override fun onSaveBtnClicked(isUpdate: Boolean, person: Person) {
         lifecycleScope.launch(Dispatchers.IO) {
-
             if (isUpdate)
                 dao?.savePerson(person)
             else
