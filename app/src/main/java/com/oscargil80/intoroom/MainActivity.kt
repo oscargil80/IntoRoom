@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
+
+// Listo terminado
 class MainActivity : AppCompatActivity(), AddEditPersonFragment.AddEditPersonListener {
     private lateinit var binding: ActivityMainBinding
     private var dao: PersonDao? = null
